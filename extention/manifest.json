@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Quill Reply for Gmail",
+  "version": "1.0.0",
+  "description": "Write email replies in Gmail with AI.",
+  "host_permissions": ["https://mail.google.com/*", "http://localhost:8080/*"],
+  "background": { "service_worker": "background.js" },
+  "content_scripts": [
+    { "matches": ["https://mail.google.com/*"], "js": ["content.js"] }
+  ]
+}
