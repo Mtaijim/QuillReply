@@ -50,5 +50,40 @@ public class RateLimitInterceptor implements HandlerInterceptor {
         response.getWriter().write("{\"error\":\"" + errorMessage + "\"}");
         return false; // blocked
     }
+    private synchronized String checkLimits(String ip, long now) {
+
+        List<Long> ipTimes = requestTimes.computeIfAbsent(ip, key -> new ArrayList<>());
+
+        // Forget old requests
+        ipTimes.removeIf(time -> time < now - DAY);
+        globalTimes.removeIf(time -> time < now - MINUTE);
+
+        // Housekeeping: drop IPs we haven't seen for a day, so memory doesn't grow forever
+        if (requestTimes.size() > 5000) {
+            requestTimes.values().removeIf(List::isEmpty);
+        }
+
+        // Rule 1: everyone together
+        if (globalTimes.size() >= globalPerMinuteLimit) {
+            return "The service is busy right now. Please try again in a minute.";
+        }
+
+        // Rule 2: this IP, per day
+        if (ipTimes.size() >= perDayLimit) {
+            return "Daily limit reached. Please come back tomorrow.";
+        }
+
+        // Rule 3: this IP, per minute
+        List<Long> lastMinute = ipTimes.stream().filter(time -> time >= now - MINUTE).toList();
+        if (lastMinute.size() >= perMinuteLimit) {
+            long secondsToWait = (lastMinute.get(0) + MINUTE - now) / 1000 + 1;
+            return "Too many requests. Try again in " + secondsToWait + " seconds.";
+        }
+
+        // All rules passed: remember this request and allow it
+        ipTimes.add(now);
+        globalTimes.add(now);
+        return null;
+    }
 
 }
