@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #14213d;
+  --color-soft: #55607a;
+  --color-paper: #f3f5f9;
+  --color-line: #d9deea;
+  --color-cobalt: #2b50e6;
+  --color-postred: #d8434a;
+  --font-sans: "Instrument Sans", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+}
+
+body {
+  @apply bg-paper text-ink font-sans antialiased;
+}
+
+.stripe {
+  background: repeating-linear-gradient(
+    135deg,
+    #d8434a 0 14px,
+    #fff 14px 24px,
+    #2b50e6 24px 38px,
+    #fff 38px 48px
+  );
+}
+
+:focus-visible {
+  outline: 3px solid #2b50e6;
+  outline-offset: 2px;
+}
