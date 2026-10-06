@@ -31,6 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
-.env
 .env.*
 !.env.exampl
+target/
+.idea/
+.env
